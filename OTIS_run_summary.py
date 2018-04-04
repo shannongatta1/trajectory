@@ -7,14 +7,13 @@ Version 1.0 - Bryan Munro - 7/25/2017
 import sys
 
 def ReadOP1File():
-    print("done1")
     import sys
     import os
     import glob
     from pathlib import Path
     #Initialize variables
     # inputdir = sys.argv[1]
-    inputdir = 'S:\\4-ENGINEERING\\18-Software\\OTIS_RunSummary\\Smaller sample'
+    inputdir = "/Users/bummookoh/Projects/trajectory/example" #'S:\\4-ENGINEERING\\18-Software\\OTIS_RunSummary\\Smaller sample'
     # inputdir = 'S:\\4-ENGINEERING\\18-Software\\OTIS_RunSummary\\foldertest'
     EmptyLineCounter = 0
     HeaderLine = False
@@ -22,23 +21,25 @@ def ReadOP1File():
     ExplicitLine = False
     PreviousLine = False
     index = 0
-    print("done2")
 
 
     full_path = []
-    for root, dirs, files in os.walk(inputdir):
-        for name in glob.glob("*.op1"):
-            full_path.append(os.path.join(root, name))
-            full_path.append(full_path)
-            print("done3")
-            
-    # full_path = full_path[1]
-    # all_path = full_path[1::2]
-    print full_path
-    # with open(full_path, "r") as data:
-    #     print data.readline()
-                                                                    
+    dirList = glob.glob(inputdir + "/*/*.op1")
+    for filePath in dirList:
+        full_path.append(filePath)
 
+    print full_path
+
+    for filePath in full_path:
+        get_first_and_last_line(filePath)
+
+                                                                    
+def get_first_and_last_line(file_path):
+    with open(file_path, "rb") as f:
+        first_line = f.readline()
+        for last_line in f: pass 
+    print first_line
+    print last_line
             
 
         #Read the file line by line
