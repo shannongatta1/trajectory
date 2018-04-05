@@ -5,17 +5,18 @@ Version 1.0 - Bryan Munro - 7/25/2017
 
 """
 import sys
+import datetime
+import os
+import glob
+from pathlib import Path
 
 
 def ReadOP1File():
-    import sys
-    import os
-    import glob
-    from pathlib import Path
+
     # Initialize variables
     # inputdir = sys.argv[1]
     # 'S:\\4-ENGINEERING\\18-Software\\OTIS_RunSummary\\Smaller sample'
-    inputdir = "/Users/bummookoh/Projects/trajectory/example"
+    inputdir = sys.argv[1] #"/Users/bummookoh/Projects/trajectory/example"
     # inputdir = 'S:\\4-ENGINEERING\\18-Software\\OTIS_RunSummary\\foldertest'
     EmptyLineCounter = 0
     HeaderLine = False
@@ -29,17 +30,41 @@ def ReadOP1File():
     for filePath in dirList:
         full_path.append(filePath)
 
-    print full_path
+    implicit_start = []
+    implicit_end = []
+    explicit_start = []
+    explicit_end = []
+
+    headings = ""
 
     for filePath in full_path:
         heading, first_para, second_para, isTwoPara = get_first_and_last_line(
             filePath)
-        print heading
-        print first_para[0]
-        print first_para[1]
+        headings = heading
+        file_name = filePath.replace(inputdir, "").split("/")[1]
+        implicit_start.append(file_name + " " + first_para["first-line"])
+        implicit_end.append(file_name + " " + first_para["last-line"])
+        explicit_start.append(file_name + " " + second_para["first-line"])
+        explicit_end.append(file_name + " " + second_para["last-line"])
+    printCsv(implicit_start, implicit_end,
+             explicit_start, explicit_end, headings)
 
-        print second_para[0]
-        print second_para[1]
+
+def printCsv(implicit_start, implicit_end, explicit_start, explicit_end, headings):
+    time = datetime.datetime.utcnow()
+    with open(str(time) + '.csv', 'w') as f:
+        writeLines(f, implicit_start, "implicit_start", headings)
+        writeLines(f, implicit_end, "implicit_end", headings)
+        writeLines(f, explicit_start, "explicit_start", headings)
+        writeLines(f, explicit_end, "explicit_end", headings)
+
+
+def writeLines(f, data_type, name, headings):
+    f.write("\n")
+    f.write(name + "\n")
+    f.write(joinByComma("folder " + headings) + "\n")
+    for line in data_type:
+        f.write(joinByComma(line) + "\n")
 
 
 def get_first_and_last_line(file_path):
@@ -48,7 +73,7 @@ def get_first_and_last_line(file_path):
     first_para = {}
     second_para = {}
     with open(file_path, "rb") as f:
-        first_line = f.readline()
+        heading = f.readline()
 
         for line in f:
             if line.strip() == "" and not start_first_paragraph:
@@ -59,21 +84,20 @@ def get_first_and_last_line(file_path):
                 start_second_paragraph = True
                 continue
 
-            if len(first_para) < 1:
-                first_para[0] = line
+            if start_first_paragraph and len(first_para) < 1:
+                first_para["first-line"] = line
             elif start_first_paragraph:
-                first_para[1] = line
+                first_para["last-line"] = line
 
-            if len(second_para) < 1:
-                second_para[0] = line
-                
+            if start_second_paragraph and len(second_para) < 1:
+                second_para["first-line"] = line
             elif start_second_paragraph:
-                second_para[1] = line
+                second_para["last-line"] = line
 
-    return (first_line,first_para,second_para,start_second_paragraph)
+    return (heading, first_para, second_para, start_second_paragraph)
 
 
-def convertToCsv(text):
+def joinByComma(text):
     return ",".join(text.split())
 
     # Read the file line by line
