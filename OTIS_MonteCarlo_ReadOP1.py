@@ -29,15 +29,21 @@ def ReadOP1File():
 
     #extract and assign values from the dictionary
     for filePath in full_path:
-        heading, first_para, second_para, isTwoPara = get_first_and_last_line(
+        heading, first_para, second_para = get_first_and_last_line(
             filePath)
-        #modify each of the values to display according output on the .csv
-        headings = heading
-        file_name = filePath.replace(inputdir, "").split("/")[0]
-        implicit_start.append(file_name + " " + first_para["first-line"])
-        implicit_end.append(file_name + " " + first_para["last-line"])
-        explicit_start.append(file_name + " " + second_para["first-line"])
-        explicit_end.append(file_name + " " + second_para["last-line"])
+        if len(second_para) > 0:
+            #modify each of the values to display according output on the .csv
+            headings = heading
+            file_name = filePath.replace(inputdir, "").split("/")[0]
+            implicit_start.append(file_name + " " + first_para["first-line"])
+            implicit_end.append(file_name + " " + first_para["last-line"])
+            explicit_start.append(file_name + " " + second_para["first-line"])
+            explicit_end.append(file_name + " " + second_para["last-line"])
+        elif len(first_para) > 0:
+            headings = heading
+            file_name = filePath.replace(inputdir, "").split("/")[0]
+            explicit_start.append(file_name + " " + first_para["first-line"])
+            explicit_end.append(file_name + " " + first_para["last-line"])
     #call function and pass through the lists needing to be written to .csv
     printCsv(implicit_start, implicit_end,
              explicit_start, explicit_end, headings)
@@ -45,13 +51,18 @@ def ReadOP1File():
 
 def printCsv(implicit_start, implicit_end, explicit_start, explicit_end, headings):
     #assign time to distinguish between .csv files 
-    timestr = time.strftime("%Y%m%d-%H%M%S")
+    timestr = time.strftime("%Y%m%d-")
+    if len(implicit_start) > 0:
     #write out each file 
-    with open(str(timestr)+ "OTIS_OP1_Readings" + '.csv', 'w') as f:
-        writeLines(f, implicit_start, "implicit_start", headings)
-        writeLines(f, implicit_end, "implicit_end", headings)
-        writeLines(f, explicit_start, "explicit_start", headings)
-        writeLines(f, explicit_end, "explicit_end", headings)
+        with open(str(timestr)+ "OTIS_OP1_Readings" + '.csv', 'w') as f:
+            writeLines(f, implicit_start, "implicit_start", headings)
+            writeLines(f, implicit_end, "implicit_end", headings)
+            writeLines(f, explicit_start, "explicit_start", headings)
+            writeLines(f, explicit_end, "explicit_end", headings)
+    elif len(explicit_start) > 0:
+        with open(str(timestr)+ "OTIS_OP1_Readings" + '.csv', 'w') as f:
+            writeLines(f, explicit_start, "explicit_start", headings)
+            writeLines(f, explicit_end, "explicit_end", headings)
 
 
 def writeLines(f, data_type, name, headings):
@@ -100,8 +111,7 @@ def get_first_and_last_line(file_path):
             #else its the last line
             elif start_second_paragraph:
                 second_para["last-line"] = line
-
-    return (heading, first_para, second_para, start_second_paragraph)
+    return (heading, first_para, second_para)
 
 #make the data comma delimited
 def joinByComma(text):
