@@ -1,5 +1,5 @@
 # **OTIS Trajectory Predictions** 
-### These python scripts give a summary of OTIS projection data.
+These python scripts give a summary of OTIS projection data.
 
 ## OTIS_MonteCarlo_ReadOP1.py
 This is the main file of the two to be run by command line. The script detects the individual paragraphs of data. If there are two paragraphs, the script identifies the first paragraph as Implicit and the second paragraph as Explicit. If there is only one paragraph  then the script will identify the data as Explicit. After that, each paragraph is parsed through to identify the first and last line, then output to a .csv file with it's filepath and Implicit/Explicit identifyer. This will run throught the course of multiple .op1 files.
