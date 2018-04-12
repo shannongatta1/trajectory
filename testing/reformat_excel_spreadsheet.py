@@ -117,7 +117,7 @@ def writePhase(f, data_type, name, headings):
             if phase_number == count:
                 f.write(joinByComma(line) + "\n")
             else:
-                continue
+                print("working")
 
 
 
