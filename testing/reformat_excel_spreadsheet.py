@@ -106,18 +106,17 @@ def writePhase(f, data_type, name, headings):
     count = 0
     f.write("\n")
     f.write(name + "\n")
-    for line in range(len(data_type)):
+    for line in range(1, 13):
         f.write(joinByComma("Phase_{}".format(line) + headings) + "\n")
         for data_number in data_type:
             data_test = data_number.split()
-            print data_test
-            phase_number = str(int(float(data_test[1])))
-            print phase_number
-            count += 1
-            if phase_number == count:
-                f.write(joinByComma(line) + "\n")
-            else:
-                print("working")
+            if len(data_test) > 1:
+                phase_number = str(int(float(data_test[1])))
+                count += 1
+                if phase_number == count:
+                    f.write(joinByComma(data_test) + "\n")
+                else:
+                    continue
 
 
 
