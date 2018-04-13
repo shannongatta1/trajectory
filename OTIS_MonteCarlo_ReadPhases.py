@@ -19,10 +19,10 @@ def ReadPhase():
     #if you want to run the file in the current working directory
     #Example: PS S:\4-ENGINEERING\18-Software\OTIS_RunSummary\Test01> python 'S:\4-ENGINEERING\18-Software\OTIS_RunSummary\OTIS_MonteCarlo_ReadOP1.py'
     inputdir = os.getcwd() 
-    implicit_start = []
-    implicit_end = []
-    explicit_start = []
-    explicit_end = []
+    implicit_start = {}
+    implicit_end = {}
+    explicit_start = {}
+    explicit_end = {}
     headings = ""
     full_path = []
 
@@ -46,9 +46,15 @@ def ReadPhase():
             for i in range(1, len(second_para)/2+1):
                 #Kraken_FinStudy3_Config5_Run001 [first line of numbers]
                 #key is set as a string to be able to append with "-2"
-                explicit_start.append(file_name + " " + second_para[str(i)])
-                explicit_end.append(file_name + " " + second_para[str(i) + "-2"])
-
+                phase_number = str(int(float(second_para[str(i)].split()[0])))
+                if phase_number in explicit_start:
+                    explicit_start[phase_number].append(file_name + " " + second_para[str(i)])
+                else :
+                    explicit_start[phase_number] = [ file_name + " " + second_para[str(i)] ]
+                if phase_number in explicit_end:
+                    explicit_end[phase_number].append(file_name + " " + second_para[str(i) + "-2"])
+                else :
+                    explicit_end[phase_number] = [ file_name + " " + second_para[str(i) + "-2"] ]
             #if at some point the explicit files are needed
             # for i in range(1, len(first_para)/2+1):
             #     implicit_start.append(file_name + " " + first_para[str(i)])
@@ -60,11 +66,16 @@ def ReadPhase():
             file_name = filePath.replace(inputdir, "").split("\\")[1]
 
             for i in range(1, len(first_para)/2+1):
-                explicit_start.append(file_name + " " + first_para[str(i)])
-                explicit_end.append(file_name + " " + first_para[str(i) + "-2"])
+                phase_number = str(int(float(first_para[str(i)].split()[0])))
+                if phase_number in explicit_start:
+                    explicit_start[phase_number].append(file_name + " " + first_para[str(i)])
+                else :
+                    explicit_start[phase_number] = [ file_name + " " + first_para[str(i)] ]
+                if phase_number in explicit_end:
+                    explicit_end[phase_number].append(file_name + " " + first_para[str(i) + "-2"])
+                else :
+                    explicit_end[phase_number] = [ file_name + " " + first_para[str(i) + "-2"] ]
         #adding spaces between different files        
-        explicit_start.append("")
-        explicit_end.append("")
     #call function and pass through the lists needing to be written to .csv
     printCsv(implicit_start, implicit_end,
              explicit_start, explicit_end, headings)
@@ -91,9 +102,12 @@ def writeLines(f, data_type, name, headings):
     #calls function to comma delim data
     f.write("\n")
     f.write(name + "\n")
-    f.write(joinByComma("filepath " + headings) + "\n")
-    for line in data_type:
-        f.write(joinByComma(line) + "\n")
+    
+    for i in range(1, len(data_type)+1):
+        f.write(joinByComma("Phase"+ str(i) + headings) + "\n")
+        for row in data_type[str(i)]:
+            f.write(",".join(row.split()) + "\n")
+        f.write("\n")
 
 
 def get_first_and_last_line(file_path):
